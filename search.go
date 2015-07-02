@@ -60,11 +60,11 @@
 package ldap
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
-	"strings"
-
 	"gopkg.in/asn1-ber.v1"
+	"strings"
 )
 
 const (
@@ -139,6 +139,15 @@ func (e *Entry) Print() {
 	}
 }
 
+func (e *Entry) Sprint() string {
+	var buffer bytes.Buffer
+	buffer.WriteString(fmt.Sprintf("DN: %s\n", e.DN))
+	for _, attr := range e.Attributes {
+		buffer.WriteString(attr.Sprint())
+	}
+	return buffer.String()
+}
+
 func (e *Entry) PrettyPrint(indent int) {
 	fmt.Printf("%sDN: %s\n", strings.Repeat(" ", indent), e.DN)
 	for _, attr := range e.Attributes {
@@ -154,6 +163,10 @@ type EntryAttribute struct {
 
 func (e *EntryAttribute) Print() {
 	fmt.Printf("%s: %s\n", e.Name, e.Values)
+}
+
+func (e *EntryAttribute) Sprint() string {
+	return fmt.Sprintf("%s: %s\n", e.Name, e.Values)
 }
 
 func (e *EntryAttribute) PrettyPrint(indent int) {
@@ -176,6 +189,14 @@ func (s *SearchResult) PrettyPrint(indent int) {
 	for _, entry := range s.Entries {
 		entry.PrettyPrint(indent)
 	}
+}
+
+func (s *SearchResult) Sprint() string {
+	var buffer bytes.Buffer
+	for _, entry := range s.Entries {
+		buffer.WriteString(entry.Sprint())
+	}
+	return buffer.String()
 }
 
 type SearchRequest struct {
